@@ -2300,7 +2300,8 @@ spawn_treehouse_get_command() {  # <project>
       ;;
   esac
   helper="!$quoted auth git-credential"
-  printf 'GIT_TERMINAL_PROMPT=0 GIT_ASKPASS=/bin/false GH_PROMPT_DISABLED=1 GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=credential.helper GIT_CONFIG_VALUE_0= GIT_CONFIG_KEY_1=credential.https://github.com.helper GIT_CONFIG_VALUE_1=%s treehouse get' "$(shell_quote "$helper")"
+  printf '%s' 'if [ -n "${GH_TOKEN:-}" ] || [ -n "${GITHUB_TOKEN:-}" ] || [ -n "${GH_CONFIG_DIR:-}" ] || { [ -n "${GH_HOST:-}" ] && [ "$GH_HOST" != github.com ]; }; then printf "%s\n" "error: GitHub prefetch refuses unsupported destination gh authentication environment" >&2; false; else '
+  printf 'GIT_TERMINAL_PROMPT=0 GIT_ASKPASS=/bin/false GH_PROMPT_DISABLED=1 GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=credential.helper GIT_CONFIG_VALUE_0= GIT_CONFIG_KEY_1=credential.https://github.com.helper GIT_CONFIG_VALUE_1=%s treehouse get; fi' "$(shell_quote "$helper")"
 }
 
 resolve_pi_executable() {

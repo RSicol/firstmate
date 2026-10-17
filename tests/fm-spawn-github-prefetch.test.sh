@@ -58,6 +58,7 @@ SH
 #!/usr/bin/env bash
 set -eu
 [ "$*" = get ] || exit 93
+printf 'treehouse-get\n' >> "$FM_PREFETCH_CASE/treehouse-calls"
 [ "${GIT_CONFIG_COUNT:-}" = 2 ] || exit 94
 [ "${GIT_CONFIG_VALUE_7+x}" != x ] || exit 95
 [ "${GIT_TERMINAL_PROMPT:-}" = 0 ] || exit 96
@@ -80,13 +81,25 @@ case "$*" in
     exit 0 ;;
 esac
 case "${1:-}" in
-  new-window|new-session) printf 'created\n' >> "$D/endpoints"; exit 0 ;;
+  new-window|new-session)
+    printf 'created\n' >> "$D/endpoints"
+    printf '@1\n'
+    exit 0 ;;
+  list-windows)
+    [ -f "$D/endpoints" ] || exit 0
+    case "$*" in
+      *'#{window_name}'*) printf 'fm-%s\n' "$FM_PREFETCH_TASK" ;;
+      *'#{window_id}'*) printf '@1\n' ;;
+    esac
+    exit 0 ;;
   display-message) printf 'firstmate\n'; exit 0 ;;
   send-keys)
     for a in "$@"; do
       case "$a" in
-        *'treehouse get')
+        *'treehouse get'|*'treehouse get; fi')
           printf '%s\n' "$a" > "$D/prefetch-command"
+          destination_auth=()
+          [ -z "${FM_PREFETCH_DEST_AUTH_ENV:-}" ] || destination_auth=("$FM_PREFETCH_DEST_AUTH_ENV")
           # A Herdr/tmux server's new shell does not inherit caller Git env.
           # Deliberately drop ALL of it, including the unlisted marker.
           (cd "$FM_PREFETCH_PROJECT" && /usr/bin/env -i \
@@ -94,19 +107,21 @@ case "${1:-}" in
             GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 \
             FM_REAL_GIT="$FM_REAL_GIT" FM_PREFETCH_CASE="$D" \
             FM_PREFETCH_EMPTY="${FM_PREFETCH_EMPTY:-0}" \
+            "${destination_auth[@]}" \
             /bin/bash --noprofile --norc -c "$a") > "$D/probe-output" 2>&1
           printf '%s\n' "$?" > "$D/probe-status"
           ;;
       esac
     done
     exit 0 ;;
-  list-windows|has-session|kill-window|set-window-option) exit 0 ;;
+  has-session|kill-window|set-window-option) exit 0 ;;
 esac
 exit 0
 SH
   chmod +x "$FAKEBIN/git" "$FAKEBIN/treehouse" "$FAKEBIN/tmux" "$GH_DIR/gh" "$DEST_BIN/gh"
   HELPER='!gh auth git-credential'
   CALLER_TOKEN=
+  DEST_AUTH_ENV=
   EMPTY_HELPER=0
   CONFIG_COUNT=2
 }
@@ -116,8 +131,8 @@ run_case() {
     GIT_CONFIG_COUNT="$CONFIG_COUNT" GIT_CONFIG_KEY_0=credential.helper GIT_CONFIG_VALUE_0='' \
     GIT_CONFIG_KEY_1=credential.https://github.com.helper GIT_CONFIG_VALUE_1="$HELPER" \
     GIT_CONFIG_VALUE_7=fixture-unlisted-marker FM_REAL_GIT="$REAL_GIT" \
-    FM_PREFETCH_CASE="$CASE_DIR" FM_PREFETCH_PROJECT="$PROJ_DIR" FM_PREFETCH_WT="$WT_DIR" \
-    FM_PREFETCH_EMPTY="$EMPTY_HELPER" \
+    FM_PREFETCH_CASE="$CASE_DIR" FM_PREFETCH_TASK="$ID" FM_PREFETCH_PROJECT="$PROJ_DIR" FM_PREFETCH_WT="$WT_DIR" \
+    FM_PREFETCH_EMPTY="$EMPTY_HELPER" FM_PREFETCH_DEST_AUTH_ENV="$DEST_AUTH_ENV" \
     FM_PREFETCH_DEST_PATH="$DEST_BIN:$FAKEBIN:/usr/bin:/bin" \
     PATH="$GH_DIR:$PATH" \
     fm_test_run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN" \
@@ -125,17 +140,43 @@ run_case() {
 }
 
 test_native_helper_reaches_fetch_shell() {
-  local out status
-  make_case native
-  out=$(run_case); status=$?
-  expect_code 0 "$status" "native helper bridge should permit isolated spawn: $out"
-  [ -f "$CASE_DIR/credential-ok" ] || fail "real Git never reached the selected fake native helper: $out"
-  assert_grep 'real-git-credential-flow' "$CASE_DIR/credential-ok" "credential flow did not complete"
-  assert_grep 'native-helper' "$CASE_DIR/helper-calls" "selected helper was not called"
-  assert_no_grep 'wrong-helper' "$CASE_DIR/helper-calls" "destination selected a different helper"
-  assert_no_grep 'fixture-unlisted-marker' "$CASE_DIR/prefetch-command" "arbitrary caller environment was copied"
-  assert_grep "worktree=$WT_DIR" "$HOME_DIR/state/$ID.meta" "spawn did not preserve isolated worktree verification"
-  pass "the existing native helper, including a quoted executable path, reaches real Git before isolation"
+  local out status auth i=0
+  for auth in '' GH_TOKEN= GITHUB_TOKEN= GH_CONFIG_DIR= GH_HOST= GH_HOST=github.com; do
+    make_case "native-$i"
+    DEST_AUTH_ENV=$auth
+    out=$(run_case); status=$?
+    expect_code 0 "$status" "native helper bridge should permit isolated spawn: $out"
+    expect_code 0 "$(< "$CASE_DIR/probe-status")" "destination prefetch failed"
+    [ -f "$CASE_DIR/credential-ok" ] || fail "real Git never reached the selected fake native helper: $out"
+    assert_grep 'real-git-credential-flow' "$CASE_DIR/credential-ok" "credential flow did not complete"
+    assert_grep 'native-helper' "$CASE_DIR/helper-calls" "selected helper was not called"
+    assert_no_grep 'wrong-helper' "$CASE_DIR/helper-calls" "destination selected a different helper"
+    assert_no_grep 'fixture-unlisted-marker' "$CASE_DIR/prefetch-command" "arbitrary caller environment was copied"
+    assert_grep "worktree=$WT_DIR" "$HOME_DIR/state/$ID.meta" "spawn did not preserve isolated worktree verification"
+    pass "the selected native helper reaches real Git with destination authentication '${auth:-unset}'"
+    i=$((i + 1))
+  done
+}
+
+test_destination_auth_overrides_refuse_before_treehouse() {
+  local out status variable marker=fixture-destination-override-not-real
+  for variable in GH_TOKEN GITHUB_TOKEN GH_CONFIG_DIR GH_HOST; do
+    make_case "destination-$variable"
+    DEST_AUTH_ENV="$variable=$marker"
+    out=$(run_case); status=$?
+    [ "$status" -ne 0 ] || fail "$variable destination override launched a worker"
+    [ -f "$CASE_DIR/probe-status" ] || fail "$variable never reached the destination shell"
+    [ "$(< "$CASE_DIR/probe-status")" -ne 0 ] || fail "$variable destination override was accepted"
+    [ ! -e "$CASE_DIR/treehouse-calls" ] || fail "$variable destination override reached Treehouse"
+    [ ! -e "$CASE_DIR/helper-calls" ] || fail "$variable destination override reached a credential helper"
+    [ ! -e "$CASE_DIR/credential-ok" ] || fail "$variable destination override completed credential lookup"
+    [ ! -e "$HOME_DIR/state/$ID.meta" ] || fail "$variable destination override published a worker record"
+    assert_grep 'refuses unsupported destination gh authentication environment' "$CASE_DIR/probe-output" "missing destination authentication refusal"
+    case "$out" in *"$marker"*) fail "$variable value leaked into spawn diagnostics" ;; esac
+    assert_no_grep "$marker" "$CASE_DIR/probe-output" "$variable value leaked into destination diagnostics"
+    assert_no_grep "$marker" "$CASE_DIR/prefetch-command" "$variable value was copied into the command"
+    pass "$variable destination-only override refuses before Treehouse without exposing its value"
+  done
 }
 
 test_missing_bridge_never_launches_worker() {
@@ -186,6 +227,7 @@ test_secret_auth_environment_is_not_transferred_or_replaced() {
 }
 
 test_native_helper_reaches_fetch_shell
+test_destination_auth_overrides_refuse_before_treehouse
 test_missing_bridge_never_launches_worker
 test_missing_destination_auth_cannot_prompt
 test_arbitrary_helper_is_not_transferred
