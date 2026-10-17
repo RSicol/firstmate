@@ -24,7 +24,7 @@ make_case() {
   git -C "$H/projects/app" remote add origin https://github.com/fixture/app.git
   cat > "$D/tool" <<'PY'
 #!/usr/bin/env python3
-import os,sys,json,pathlib
+import os,sys,json,pathlib,subprocess
 D=pathlib.Path(os.environ['PC_DIR']);H=D/'home';P=str(H/'projects/app')
 fault=(D/'fault').read_text().strip() if (D/'fault').exists() else ''
 stopped=(D/'stopped').exists();name=pathlib.Path(sys.argv[0]).name;a=sys.argv[1:]
@@ -39,11 +39,11 @@ if name=='ps':
   print('90000010 1 bash');sys.exit(0)
  if '-p' in a:
   pid=a[a.index('-p')+1]
-  if pid in ('90000011','90000012'):
+  if pid in ('90000011','90000012','90000013'):
    if stopped:sys.exit(1)
    if 'lstart=' in a:print('Thu Jan  1 00:00:01 1970');sys.exit(0)
    if 'ppid=,pgid=,uid=,lstart=' in a:
-    parent='90000010' if pid=='90000011' else ('1' if fault=='bad-parent' else '90000011')
+    parent='90000010' if pid=='90000011' else ('90000012' if pid=='90000013' else ('1' if fault=='bad-parent' else '90000011'))
     stamp='02' if fault=='changed' else '01'
     print(parent+' 90000011 '+str(os.getuid())+' Thu Jan  1 00:00:'+stamp+' 1970');sys.exit(0)
   if pid=='90000010':print('bash');sys.exit(0)
@@ -81,6 +81,12 @@ if a[:2]==['pane','process-info']:
  actor=a[a.index('--pane')+1]=='w1:p1'
  if actor:emit({'result':{'type':'pane_process_info','process_info':{'pane_id':'w1:p1','shell_pid':int(os.environ['PC_ACTOR'])}}})
  procs=[] if stopped else [{'pid':90000011,'name':'treehouse','argv':['treehouse','get'],'cwd':P},{'pid':90000012,'name':'git','argv':['git','fetch','origin'],'cwd':P}]
+ if not stopped and (D/'remote-command').exists():
+  remote=(D/'remote-command').read_text().strip()
+  origin=subprocess.check_output(['git','-C',P,'remote','get-url','origin'],text=True).strip()
+  name='git' if remote in ('remote-http','remote-https') else remote
+  argv=['git',remote] if name=='git' else [remote]
+  procs.append({'pid':90000013,'name':name,'argv':argv+['origin',origin],'cwd':P})
  if fault=='unknown-process':procs.append({'pid':90000013,'name':'node','argv':['node','pi'],'cwd':P})
  emit({'result':{'type':'pane_process_info','process_info':{'pane_id':'w1:p2','shell_pid':90000010,'foreground_process_group_id':90000011,'foreground_processes':procs}}})
 if a[:2]==['pane','send-keys']:
@@ -103,17 +109,45 @@ run_control() {
     "$ROOT/bin/fm-control.sh" orphan cancel-prestart --pane w1:p2 "$@" 2>&1
 }
 
-make_case positive
-OUT=$(run_control) || fail "qualifying snapshot failed: $OUT"
-PROOF=$(printf '%s' "$OUT" | jq -er .proof) || fail "missing snapshot proof: $OUT"
-[ ! -e "$D/keys" ] || fail "read-only snapshot sent input"
-assert_contains "$OUT" '"input_sent": false' 'snapshot did not say no input was sent'
-OUT=$(run_control --if-match "$PROOF") || fail "verified cancellation failed: $OUT"
-assert_contains "$OUT" 'prestart stopped: orphan' 'cancellation did not verify stop'
-[ "$(wc -l < "$D/keys" | tr -d ' ')" = 1 ] || fail "cancellation sent more than one key"
-[ ! -e "$H/state/orphan.meta" ] || fail "cancellation invented task metadata"
-assert_no_grep 'server ' "$D/calls" 'cancellation tried to start a server'
-pass 'a fresh exact pose cancels once, verifies stop and never adopts an agent'
+for remote in none remote-https git-remote-http git-remote-https; do
+  make_case "$remote"
+  [ "$remote" = none ] || printf '%s\n' "$remote" > "$D/remote-command"
+  OUT=$(run_control) || fail "$remote qualifying HTTPS snapshot failed: $OUT"
+  PROOF=$(printf '%s' "$OUT" | jq -er .proof) || fail "missing snapshot proof: $OUT"
+  [ ! -e "$D/keys" ] || fail "read-only snapshot sent input"
+  assert_contains "$OUT" '"input_sent": false' 'snapshot did not say no input was sent'
+
+  git -C "$H/projects/app" remote set-url origin http://github.com/fixture/app.git
+  OUT=$(run_control); RC=$?
+  [ "$RC" -ne 0 ] || fail "$remote HTTP snapshot was accepted: $OUT"
+  OUT=$(run_control --if-match "$PROOF"); RC=$?
+  [ "$RC" -ne 0 ] || fail "$remote HTTP cancellation was accepted: $OUT"
+  [ ! -e "$D/keys" ] || fail "$remote HTTP rejection sent input"
+  [ ! -e "$D/stopped" ] || fail "$remote HTTP rejection stopped the job"
+  [ ! -e "$H/state/orphan.meta" ] || fail "$remote HTTP rejection created metadata"
+  pass "$remote HTTP snapshot and cancellation refuse without input"
+
+  git -C "$H/projects/app" remote set-url origin https://github.com/fixture/app.git
+  OUT=$(run_control --if-match "$PROOF") || fail "$remote verified HTTPS cancellation failed: $OUT"
+  assert_contains "$OUT" 'prestart stopped: orphan' 'cancellation did not verify stop'
+  [ "$(wc -l < "$D/keys" | tr -d ' ')" = 1 ] || fail "cancellation sent more than one key"
+  [ ! -e "$H/state/orphan.meta" ] || fail "cancellation invented task metadata"
+  assert_no_grep 'server ' "$D/calls" 'cancellation tried to start a server'
+  pass "$remote HTTPS cancels once, verifies stop and never adopts an agent"
+done
+
+make_case remote-http
+OUT=$(run_control) || fail "initial HTTPS snapshot failed: $OUT"
+PROOF=$(printf '%s' "$OUT" | jq -er .proof) || fail 'initial proof missing'
+printf 'remote-http\n' > "$D/remote-command"
+OUT=$(run_control); RC=$?
+[ "$RC" -ne 0 ] || fail "git remote-http with HTTPS origin was accepted: $OUT"
+OUT=$(run_control --if-match "$PROOF"); RC=$?
+[ "$RC" -ne 0 ] || fail "git remote-http cancellation was accepted: $OUT"
+[ ! -e "$D/keys" ] || fail 'git remote-http sent input'
+[ ! -e "$D/stopped" ] || fail 'git remote-http stopped the job'
+[ ! -e "$H/state/orphan.meta" ] || fail 'git remote-http created metadata'
+pass 'git remote-http refuses even with an HTTPS origin'
 
 for fault in bad-home bad-project ambiguous agent unknown-process bad-parent not-held server-gone; do
   make_case "$fault"

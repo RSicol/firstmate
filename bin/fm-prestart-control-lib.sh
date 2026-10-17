@@ -97,7 +97,7 @@ fm_prestart_snapshot() {
   [ "$(fm_backend_herdr_pane_agent_state "$PRESTART_SESSION" "$PRESTART_PANE")" = no-agent ] || return 1
   info=$(fm_backend_herdr_cli "$PRESTART_SESSION" pane process-info --pane "$PRESTART_PANE") || return 1
   origin=$(git -C "$PRESTART_PROJECT" remote get-url origin) || return 1
-  case "$origin" in http://*|https://*) ;; *) return 1 ;; esac
+  case "$origin" in https://*) ;; *) return 1 ;; esac
   case "${origin#*://}" in *@*|*\?*|*\#*|*[[:space:]]*) return 1 ;; esac
   # URL and process argv remain on stdin, never in another process's argv or
   # the returned snapshot. Only the exact known prefetch command shapes qualify.
@@ -109,7 +109,7 @@ fm_prestart_snapshot() {
       def fetch: .name == "git" and (.argv | length) == 3 and (.argv[0] | base) == "git" and .argv[1:] == ["fetch", "origin"];
       def remote:
         (.name == "git" and (.argv | length) == 4 and (.argv[0] | base) == "git"
-          and (.argv[1] == "remote-https" or .argv[1] == "remote-http") and .argv[2:] == ["origin", $origin])
+          and .argv[1] == "remote-https" and .argv[2:] == ["origin", $origin])
         or ((.name == "git-remote-http" or .name == "git-remote-https") and (.argv | length) == 3
           and ((.argv[0] | base) == "git-remote-http" or (.argv[0] | base) == "git-remote-https") and .argv[1:] == ["origin", $origin]);
       select(.pane_id == $pane and (.shell_pid | type) == "number" and .shell_pid > 1)

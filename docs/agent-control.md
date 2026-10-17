@@ -66,7 +66,7 @@ A relaunch does take one session reference when the endpoint's own runtime recor
 
 ## Non-agent prestart cancellation
 
-A failed Treehouse fetch can leave its terminal job alive before any agent or task metadata was published.
+A failed Treehouse HTTPS fetch can leave its terminal job alive before any agent or task metadata was published.
 `cancel-prestart` covers only that narrow phase; it never adopts an endpoint, writes task metadata, controls an agent, closes a terminal, or discards a local copy.
 The operator must identify the specifically authorized failed start from its original evidence, not discover a target by matching labels.
 
@@ -213,4 +213,4 @@ The empirical basis for each adapter's value is the `harness-adapters` skill's v
 - `tests/fm-control.test.sh` - the adapter contract for its verified-harness lane (adapters outside the lane pin their control mechanics in their own harness suites), the backend capability matrix, exact-id scoping, the closed verb list, the busy, idle, dead, and idempotent lifecycle cases, and marker non-regression, all against a stubbed session provider.
 - `tests/fm-control-relaunch.test.sh` - the relaunch transaction: identity preservation, harness switching, the progress note, checkpoint refusals, rollback after a failed launch, and the endpoint-absence proof both verbs share - the Herdr reclaim of a destroyed endpoint, and tmux refusing one it cannot prove absent.
 - `tests/fm-control-herdr-smoke.test.sh` - the second state-verified backend against the real herdr binary, on an isolated throwaway lab session.
-- `tests/fm-control-prestart.test.sh` - executable non-agent prestart snapshots/cancellation, stale and foreign identities, ambiguous tabs, active agents and producers, unlanded changes, and unconfirmed stops against explicit fixtures.
+- `tests/fm-control-prestart.test.sh` - executable non-agent prestart snapshots/cancellation over HTTPS (including `git-remote-http` executable names), plaintext HTTP and `git remote-http` command rejection, stale and foreign identities, ambiguous tabs, active agents and producers, unlanded changes, and unconfirmed stops against explicit fixtures.
