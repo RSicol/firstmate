@@ -130,7 +130,7 @@ case "${1:-}" in
           # A Herdr/tmux server's new shell does not inherit caller Git env.
           # Deliberately drop ALL of it, including the unlisted marker.
           (cd "$FM_PREFETCH_PROJECT" && /usr/bin/env -i \
-            HOME="$D/shell-home" PATH="$FM_PREFETCH_DEST_PATH" \
+            HOME="$FM_PREFETCH_DEST_HOME" XDG_CONFIG_HOME="$FM_PREFETCH_DEST_XDG" PATH="$FM_PREFETCH_DEST_PATH" \
             GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 \
             FM_REAL_GIT="$FM_REAL_GIT" FM_PREFETCH_CASE="$D" FM_PREFETCH_WT="$FM_PREFETCH_WT" \
             FM_PREFETCH_EMPTY="${FM_PREFETCH_EMPTY:-0}" \
@@ -149,18 +149,23 @@ SH
   HELPER='!gh auth git-credential'
   CALLER_TOKEN=
   DEST_AUTH_ENV=
+  CALLER_XDG="$CASE_DIR/config root's base"
+  DEST_XDG=$CALLER_XDG
+  DEST_HOME="$CASE_DIR/shell-home"
+  mkdir -p "$CALLER_XDG/gh" "$DEST_HOME/.config/gh" "$HOME_DIR/user-home/.config/gh"
   EMPTY_HELPER=0
   CONFIG_COUNT=2
 }
 
 run_case() {
-  GH_TOKEN="$CALLER_TOKEN" GITHUB_TOKEN='' GH_CONFIG_DIR='' GH_HOST='' \
+  GH_TOKEN="$CALLER_TOKEN" GITHUB_TOKEN='' GH_CONFIG_DIR='' GH_HOST='' XDG_CONFIG_HOME="$CALLER_XDG" \
     GIT_CONFIG_COUNT="$CONFIG_COUNT" GIT_CONFIG_KEY_0=credential.helper GIT_CONFIG_VALUE_0='' \
     GIT_CONFIG_KEY_1=credential.https://github.com.helper GIT_CONFIG_VALUE_1="$HELPER" \
     GIT_CONFIG_VALUE_7=fixture-unlisted-marker FM_REAL_GIT="$REAL_GIT" \
     FM_PREFETCH_CASE="$CASE_DIR" FM_PREFETCH_TASK="$ID" FM_PREFETCH_PROJECT="$PROJ_DIR" FM_PREFETCH_WT="$WT_DIR" \
     FM_PREFETCH_EMPTY="$EMPTY_HELPER" FM_PREFETCH_DEST_AUTH_ENV="$DEST_AUTH_ENV" \
     FM_PREFETCH_SHELL="$DEST_SHELL" FM_PREFETCH_FISH_BIN="$FISH_BIN" \
+    FM_PREFETCH_DEST_HOME="$DEST_HOME" FM_PREFETCH_DEST_XDG="$DEST_XDG" \
     FM_PREFETCH_DEST_PATH="$DEST_BIN:$FAKEBIN:/usr/bin:/bin" \
     PATH="$GH_DIR:$PATH" \
     fm_test_run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN" \
@@ -206,6 +211,76 @@ test_destination_auth_overrides_refuse_before_treehouse() {
     assert_no_grep "$marker" "$CASE_DIR/probe-output" "$variable value leaked into destination diagnostics"
     assert_no_grep "$marker" "$CASE_DIR/prefetch-command" "$variable value was copied into the command"
     pass "$DEST_SHELL rejects $variable before Treehouse without exposing its value or changing directory"
+  done
+}
+
+test_matching_effective_config_roots() {
+  local context out status
+  for context in home-fallback xdg-to-home home-to-xdg equivalent-xdg; do
+    make_case "matching-$context"
+    case "$context" in
+      home-fallback) CALLER_XDG=; DEST_XDG=; DEST_HOME="$HOME_DIR/user-home" ;;
+      xdg-to-home) CALLER_XDG="$HOME_DIR/user-home/.config"; DEST_XDG=; DEST_HOME="$HOME_DIR/user-home" ;;
+      home-to-xdg) CALLER_XDG=; DEST_XDG="$HOME_DIR/user-home/.config" ;;
+      equivalent-xdg) DEST_XDG="$CALLER_XDG/./" ;;
+    esac
+    out=$(run_case); status=$?
+    expect_code 0 "$status" "$DEST_SHELL rejected matching effective roots ($context): $out"
+    expect_code 0 "$(< "$CASE_DIR/probe-status")" "$DEST_SHELL matching-root prefetch failed"
+    [ "$(< "$CASE_DIR/destination-cwd")" = "$WT_DIR" ] || fail "$DEST_SHELL matching roots lost the shell directory transition"
+    assert_grep native-helper "$CASE_DIR/helper-calls" 'matching roots never reached the selected helper'
+    [ -f "$CASE_DIR/credential-ok" ] || fail 'matching roots did not complete credential lookup'
+    pass "$DEST_SHELL accepts matching effective roots through $context"
+  done
+}
+
+test_destination_config_root_mismatch_refuses() {
+  local context out status other marker=fixture-private-root
+  for context in xdg-to-xdg xdg-to-home home-to-xdg home-to-home relative-xdg missing-xdg; do
+    make_case "root-$context"
+    other="$CASE_DIR/$marker"
+    mkdir -p "$other/gh" "$other/.config/gh"
+    case "$context" in
+      xdg-to-xdg) DEST_XDG=$other ;;
+      xdg-to-home) DEST_XDG=; DEST_HOME=$other ;;
+      home-to-xdg) CALLER_XDG=; DEST_XDG=$other ;;
+      home-to-home) CALLER_XDG=; DEST_XDG=; DEST_HOME=$other ;;
+      relative-xdg) DEST_XDG=$marker ;;
+      missing-xdg) DEST_XDG="$other/missing" ;;
+    esac
+    out=$(run_case); status=$?
+    [ "$status" -ne 0 ] || fail "$DEST_SHELL accepted a different or indeterminate configuration root ($context)"
+    [ -f "$CASE_DIR/probe-status" ] || fail "$DEST_SHELL never checked the destination root ($context)"
+    [ "$(< "$CASE_DIR/probe-status")" -ne 0 ] || fail 'destination root rejection reported success'
+    [ "$(< "$CASE_DIR/destination-cwd")" = "$PROJ_DIR" ] || fail 'root rejection changed the destination directory'
+    [ ! -e "$CASE_DIR/treehouse-calls" ] || fail 'root rejection reached Treehouse'
+    [ ! -e "$CASE_DIR/helper-calls" ] || fail 'root rejection reached a credential helper'
+    [ ! -e "$CASE_DIR/credential-ok" ] || fail 'root rejection completed credential lookup'
+    [ ! -e "$HOME_DIR/state/$ID.meta" ] || fail 'root rejection published a worker record'
+    assert_grep 'gh configuration root' "$CASE_DIR/probe-output" 'missing root refusal diagnostic'
+    case "$out" in *"$marker"*) fail 'destination root leaked into spawn diagnostics' ;; esac
+    assert_no_grep "$marker" "$CASE_DIR/probe-output" 'destination root leaked into the guard diagnostic'
+    assert_no_grep "$marker" "$CASE_DIR/prefetch-command" 'destination root was copied into the command'
+    pass "$DEST_SHELL rejects $context configuration roots before Treehouse without disclosure"
+  done
+}
+
+test_indeterminate_caller_root_refuses() {
+  local context out status marker=fixture-indeterminate-root
+  for context in relative missing; do
+    make_case "caller-root-$context"
+    case "$context" in
+      relative) CALLER_XDG=$marker ;;
+      missing) CALLER_XDG="$CASE_DIR/$marker" ;;
+    esac
+    out=$(run_case); status=$?
+    [ "$status" -ne 0 ] || fail 'an indeterminate caller root was accepted'
+    [ ! -e "$CASE_DIR/endpoints" ] || fail 'an indeterminate caller root created an endpoint'
+    [ ! -e "$CASE_DIR/treehouse-calls" ] || fail 'an indeterminate caller root reached Treehouse'
+    [ ! -e "$CASE_DIR/helper-calls" ] || fail 'an indeterminate caller root reached the helper'
+    assert_contains "$out" 'cannot determine gh configuration root' 'missing caller root refusal'
+    case "$out" in *"$marker"*) fail 'caller root leaked into diagnostics' ;; esac
+    pass "$DEST_SHELL rejects $context caller roots before endpoint creation"
   done
 }
 
@@ -259,6 +334,9 @@ test_secret_auth_environment_is_not_transferred_or_replaced() {
 for DEST_SHELL in bash fish; do
   test_native_helper_reaches_fetch_shell
   test_destination_auth_overrides_refuse_before_treehouse
+  test_matching_effective_config_roots
+  test_destination_config_root_mismatch_refuses
+  test_indeterminate_caller_root_refuses
   test_missing_bridge_never_launches_worker
   test_missing_destination_auth_cannot_prompt
   test_arbitrary_helper_is_not_transferred

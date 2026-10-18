@@ -2261,10 +2261,10 @@ shell_quote() {
   printf "'"
 }
 
-# Only the explicitly selected native helper descriptor crosses a server-created
-# shell boundary; forwarding arbitrary GIT_CONFIG_VALUE_* could copy secrets.
+# Only the selected native helper and non-secret expected configuration root
+# cross the shell boundary; arbitrary GIT_CONFIG_VALUE_* could copy secrets.
 spawn_treehouse_get_command() {  # <project>
-  local origin gh quoted helper guard
+  local origin gh quoted helper guard config_root
   if [ "${GIT_CONFIG_COUNT:-}" != 2 ] ||
     [ "${GIT_CONFIG_KEY_0:-}" != credential.helper ] ||
     [ -n "${GIT_CONFIG_VALUE_0:-}" ] ||
@@ -2283,6 +2283,12 @@ spawn_treehouse_get_command() {  # <project>
     echo 'error: GitHub prefetch cannot forward a token or custom gh authentication environment; refusing to choose a different credential store' >&2
     return 1
   fi
+  guard='if [ -n "${GH_TOKEN:-}" ] || [ -n "${GITHUB_TOKEN:-}" ] || [ -n "${GH_CONFIG_DIR:-}" ] || { [ -n "${GH_HOST:-}" ] && [ "$GH_HOST" != github.com ]; }; then printf "%s\n" "error: GitHub prefetch refuses unsupported destination gh authentication environment" >&2; exit 1; fi
+base=${XDG_CONFIG_HOME:-${HOME:+$HOME/.config}}
+case "$base" in /*) ;; *) printf "%s\n" "error: GitHub prefetch cannot determine gh configuration root" >&2; exit 1 ;; esac
+root=$(cd -P "$base/gh" 2>/dev/null && pwd -P) || { printf "%s\n" "error: GitHub prefetch cannot determine gh configuration root" >&2; exit 1; }
+if [ "$#" -eq 0 ]; then printf "%s" "$root"; elif [ "$root" != "$1" ]; then printf "%s\n" "error: GitHub prefetch gh configuration root differs from caller" >&2; exit 1; fi'
+  config_root=$(/bin/sh -c "$guard") || return 1
   gh=$(type -P gh 2>/dev/null) && [ -x "$gh" ] || {
     echo 'error: GitHub prefetch needs the existing native gh executable' >&2
     return 1
@@ -2302,8 +2308,9 @@ spawn_treehouse_get_command() {  # <project>
   helper="!$quoted auth git-credential"
   helper=${helper//\'/\'\"\'\"\'}
   helper=${helper//\\/\'\"\\\\\"\'}
-  guard='if [ -n "${GH_TOKEN:-}" ] || [ -n "${GITHUB_TOKEN:-}" ] || [ -n "${GH_CONFIG_DIR:-}" ] || { [ -n "${GH_HOST:-}" ] && [ "$GH_HOST" != github.com ]; }; then printf "%s\n" "error: GitHub prefetch refuses unsupported destination gh authentication environment" >&2; exit 1; fi'
-  printf '/bin/sh -c %s && GIT_TERMINAL_PROMPT=0 GIT_ASKPASS=/bin/false GH_PROMPT_DISABLED=1 GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=credential.helper GIT_CONFIG_VALUE_0= GIT_CONFIG_KEY_1=credential.https://github.com.helper GIT_CONFIG_VALUE_1='\''%s'\'' treehouse get' "$(shell_quote "$guard")" "$helper"
+  config_root=${config_root//\'/\'\"\'\"\'}
+  config_root=${config_root//\\/\'\"\\\\\"\'}
+  printf '/bin/sh -c %s gh-prefetch '\''%s'\'' && GIT_TERMINAL_PROMPT=0 GIT_ASKPASS=/bin/false GH_PROMPT_DISABLED=1 GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=credential.helper GIT_CONFIG_VALUE_0= GIT_CONFIG_KEY_1=credential.https://github.com.helper GIT_CONFIG_VALUE_1='\''%s'\'' treehouse get' "$(shell_quote "$guard")" "$config_root" "$helper"
 }
 
 resolve_pi_executable() {
