@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Drive fm-spawn's executable interface across a server-created shell boundary.
-# Only tools/terminals are fixtures: the destination runs real Bash and real Git
+# Only tools/terminals are fixtures: the destination runs real Bash/Fish and Git
 # credential plumbing against an explicitly fake gh, with no network or model.
 set -u
 
@@ -11,9 +11,10 @@ TMP_ROOT=$(fm_test_tmproot fm-spawn-github-prefetch)
 mkdir -p "$TMP_ROOT"
 trap 'fm_test_cleanup' EXIT
 REAL_GIT=$(type -P git)
+FISH_BIN=$(type -P fish) || fail 'fish is required for destination compatibility checks'
 
 make_case() {
-  local name=$1
+  local name="$DEST_SHELL-$1"
   CASE_DIR="$TMP_ROOT/$name"
   HOME_DIR="$CASE_DIR/home"
   PROJ_DIR="$CASE_DIR/project"
@@ -70,13 +71,34 @@ case "$reply" in
 esac
 printf 'real-git-credential-flow\n' > "$FM_PREFETCH_CASE/credential-ok"
 SH
+  cat > "$CASE_DIR/pane.bash" <<'SH'
+treehouse() {
+  command treehouse "$@" && cd -- "$FM_PREFETCH_WT"
+}
+eval "$1"
+result=$?
+pwd > "$FM_PREFETCH_CASE/destination-cwd"
+exit "$result"
+SH
+  cat > "$CASE_DIR/pane.fish" <<'FISH'
+function treehouse
+  command treehouse $argv
+  and cd -- "$FM_PREFETCH_WT"
+end
+eval "$argv[1]"
+set -l result $status
+pwd > "$FM_PREFETCH_CASE/destination-cwd"
+exit $result
+FISH
   cat > "$FAKEBIN/tmux" <<'SH'
 #!/usr/bin/env bash
 set -u
 D=$FM_PREFETCH_CASE
 case "$*" in
   *'#{pane_current_path}'*)
-    if [ -f "$D/credential-ok" ]; then printf '%s\n' "$FM_PREFETCH_WT";
+    if [ -f "$D/destination-cwd" ]; then
+      IFS= read -r cwd < "$D/destination-cwd"
+      printf '%s\n' "$cwd"
     else printf '%s\n' "$FM_PREFETCH_PROJECT"; fi
     exit 0 ;;
 esac
@@ -96,19 +118,24 @@ case "${1:-}" in
   send-keys)
     for a in "$@"; do
       case "$a" in
-        *'treehouse get'|*'treehouse get; fi')
+        *'treehouse get')
           printf '%s\n' "$a" > "$D/prefetch-command"
           destination_auth=()
           [ -z "${FM_PREFETCH_DEST_AUTH_ENV:-}" ] || destination_auth=("$FM_PREFETCH_DEST_AUTH_ENV")
+          case "$FM_PREFETCH_SHELL" in
+            bash) destination=(/bin/bash --noprofile --norc "$D/pane.bash") ;;
+            fish) destination=("$FM_PREFETCH_FISH_BIN" --no-config "$D/pane.fish") ;;
+            *) exit 99 ;;
+          esac
           # A Herdr/tmux server's new shell does not inherit caller Git env.
           # Deliberately drop ALL of it, including the unlisted marker.
           (cd "$FM_PREFETCH_PROJECT" && /usr/bin/env -i \
             HOME="$D/shell-home" PATH="$FM_PREFETCH_DEST_PATH" \
             GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 \
-            FM_REAL_GIT="$FM_REAL_GIT" FM_PREFETCH_CASE="$D" \
+            FM_REAL_GIT="$FM_REAL_GIT" FM_PREFETCH_CASE="$D" FM_PREFETCH_WT="$FM_PREFETCH_WT" \
             FM_PREFETCH_EMPTY="${FM_PREFETCH_EMPTY:-0}" \
             "${destination_auth[@]}" \
-            /bin/bash --noprofile --norc -c "$a") > "$D/probe-output" 2>&1
+            "${destination[@]}" "$a") > "$D/probe-output" 2>&1
           printf '%s\n' "$?" > "$D/probe-status"
           ;;
       esac
@@ -133,6 +160,7 @@ run_case() {
     GIT_CONFIG_VALUE_7=fixture-unlisted-marker FM_REAL_GIT="$REAL_GIT" \
     FM_PREFETCH_CASE="$CASE_DIR" FM_PREFETCH_TASK="$ID" FM_PREFETCH_PROJECT="$PROJ_DIR" FM_PREFETCH_WT="$WT_DIR" \
     FM_PREFETCH_EMPTY="$EMPTY_HELPER" FM_PREFETCH_DEST_AUTH_ENV="$DEST_AUTH_ENV" \
+    FM_PREFETCH_SHELL="$DEST_SHELL" FM_PREFETCH_FISH_BIN="$FISH_BIN" \
     FM_PREFETCH_DEST_PATH="$DEST_BIN:$FAKEBIN:/usr/bin:/bin" \
     PATH="$GH_DIR:$PATH" \
     fm_test_run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN" \
@@ -145,15 +173,16 @@ test_native_helper_reaches_fetch_shell() {
     make_case "native-$i"
     DEST_AUTH_ENV=$auth
     out=$(run_case); status=$?
-    expect_code 0 "$status" "native helper bridge should permit isolated spawn: $out"
-    expect_code 0 "$(< "$CASE_DIR/probe-status")" "destination prefetch failed"
+    expect_code 0 "$status" "native helper bridge should permit isolated spawn: $out; destination output: $(< "$CASE_DIR/probe-output")"
+    expect_code 0 "$(< "$CASE_DIR/probe-status")" "$DEST_SHELL destination prefetch failed"
+    [ "$(< "$CASE_DIR/destination-cwd")" = "$WT_DIR" ] || fail "$DEST_SHELL lost Treehouse's parent-shell directory transition"
     [ -f "$CASE_DIR/credential-ok" ] || fail "real Git never reached the selected fake native helper: $out"
     assert_grep 'real-git-credential-flow' "$CASE_DIR/credential-ok" "credential flow did not complete"
     assert_grep 'native-helper' "$CASE_DIR/helper-calls" "selected helper was not called"
     assert_no_grep 'wrong-helper' "$CASE_DIR/helper-calls" "destination selected a different helper"
     assert_no_grep 'fixture-unlisted-marker' "$CASE_DIR/prefetch-command" "arbitrary caller environment was copied"
     assert_grep "worktree=$WT_DIR" "$HOME_DIR/state/$ID.meta" "spawn did not preserve isolated worktree verification"
-    pass "the selected native helper reaches real Git with destination authentication '${auth:-unset}'"
+    pass "$DEST_SHELL preserves the parent-shell directory transition and native helper with authentication '${auth:-unset}'"
     i=$((i + 1))
   done
 }
@@ -167,6 +196,7 @@ test_destination_auth_overrides_refuse_before_treehouse() {
     [ "$status" -ne 0 ] || fail "$variable destination override launched a worker"
     [ -f "$CASE_DIR/probe-status" ] || fail "$variable never reached the destination shell"
     [ "$(< "$CASE_DIR/probe-status")" -ne 0 ] || fail "$variable destination override was accepted"
+    [ "$(< "$CASE_DIR/destination-cwd")" = "$PROJ_DIR" ] || fail "$DEST_SHELL changed directory on credential refusal"
     [ ! -e "$CASE_DIR/treehouse-calls" ] || fail "$variable destination override reached Treehouse"
     [ ! -e "$CASE_DIR/helper-calls" ] || fail "$variable destination override reached a credential helper"
     [ ! -e "$CASE_DIR/credential-ok" ] || fail "$variable destination override completed credential lookup"
@@ -175,7 +205,7 @@ test_destination_auth_overrides_refuse_before_treehouse() {
     case "$out" in *"$marker"*) fail "$variable value leaked into spawn diagnostics" ;; esac
     assert_no_grep "$marker" "$CASE_DIR/probe-output" "$variable value leaked into destination diagnostics"
     assert_no_grep "$marker" "$CASE_DIR/prefetch-command" "$variable value was copied into the command"
-    pass "$variable destination-only override refuses before Treehouse without exposing its value"
+    pass "$DEST_SHELL rejects $variable before Treehouse without exposing its value or changing directory"
   done
 }
 
@@ -187,7 +217,7 @@ test_missing_bridge_never_launches_worker() {
   [ "$status" -ne 0 ] || fail "missing helper bridge incorrectly launched a worker"
   [ ! -f "$HOME_DIR/state/$ID.meta" ] || fail "failed isolation published a worker record"
   grep -Fxq 'treehouse get' "$CASE_DIR/prefetch-command" || fail "non-opted-in command changed"
-  pass "an absent bridge retains ordinary behavior and cannot bypass isolation"
+  pass "$DEST_SHELL without the bridge retains ordinary behavior and cannot bypass isolation"
 }
 
 test_missing_destination_auth_cannot_prompt() {
@@ -199,7 +229,7 @@ test_missing_destination_auth_cannot_prompt() {
   [ ! -f "$HOME_DIR/state/$ID.meta" ] || fail "failed authentication published a worker record"
   assert_grep 'native-helper' "$CASE_DIR/helper-calls" "authentication fixture never exercised the helper"
   assert_grep 'terminal prompts disabled' "$CASE_DIR/probe-output" "missing authentication was not rejected noninteractively"
-  pass "missing destination authentication refuses without asking for credentials"
+  pass "$DEST_SHELL missing destination authentication refuses without asking for credentials"
 }
 
 test_arbitrary_helper_is_not_transferred() {
@@ -211,7 +241,7 @@ test_arbitrary_helper_is_not_transferred() {
   [ ! -f "$CASE_DIR/endpoints" ] || fail "unsupported helper created an endpoint"
   assert_contains "$out" 'supports only the existing native gh' "missing explicit helper refusal"
   case "$out" in *fixture-unsupported-helper-with-private-marker*) fail "helper value leaked into diagnostics" ;; esac
-  pass "an arbitrary helper is refused before endpoint creation without printing its value"
+  pass "$DEST_SHELL arbitrary helper is refused before endpoint creation without printing its value"
 }
 
 test_secret_auth_environment_is_not_transferred_or_replaced() {
@@ -223,12 +253,14 @@ test_secret_auth_environment_is_not_transferred_or_replaced() {
   [ ! -f "$CASE_DIR/endpoints" ] || fail "unsupported authentication created an endpoint"
   assert_contains "$out" 'refusing to choose a different credential store' "missing authentication-scope refusal"
   case "$out" in *fixture-token-not-real*) fail "token value leaked into diagnostics" ;; esac
-  pass "a token environment is neither copied nor silently replaced by another account store"
+  pass "$DEST_SHELL token environment is neither copied nor silently replaced by another account store"
 }
 
-test_native_helper_reaches_fetch_shell
-test_destination_auth_overrides_refuse_before_treehouse
-test_missing_bridge_never_launches_worker
-test_missing_destination_auth_cannot_prompt
-test_arbitrary_helper_is_not_transferred
-test_secret_auth_environment_is_not_transferred_or_replaced
+for DEST_SHELL in bash fish; do
+  test_native_helper_reaches_fetch_shell
+  test_destination_auth_overrides_refuse_before_treehouse
+  test_missing_bridge_never_launches_worker
+  test_missing_destination_auth_cannot_prompt
+  test_arbitrary_helper_is_not_transferred
+  test_secret_auth_environment_is_not_transferred_or_replaced
+done
