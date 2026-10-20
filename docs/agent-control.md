@@ -67,15 +67,14 @@ A relaunch does take one session reference when the endpoint's own runtime recor
 ## Non-agent prestart cancellation
 
 A failed Treehouse HTTPS fetch can leave its terminal job alive before any agent or task metadata was published.
-`cancel-prestart` covers only that narrow phase; it never adopts an endpoint, writes task metadata, controls an agent, closes a terminal, or discards a local copy.
+`cancel-prestart` is Herdr-only and covers only that narrow phase; it never adopts an endpoint, writes task metadata, controls an agent, closes a terminal, or discards a local copy.
 The operator must identify the specifically authorized failed start from its original evidence, not discover a target by matching labels.
 
-First use `fm-control.sh <task-id> cancel-prestart --pane <pane-id>` for a fresh identity snapshot with `input_sent=false`.
-After comparing that snapshot with the original failed start, repeat it with `--if-match <fingerprint>` to request cancellation.
+[`fm-control.sh --help`](../bin/fm-control.sh) owns the supported limits and two-step inspection/cancellation invocation; inspection sends no input.
 The fingerprint only constrains freshness; it grants no authority, and every ownership/process condition is checked again.
 The original processes must be gone while the same terminal survives and the project stays clean and unchanged; unconfirmed cancellation never escalates to more input.
 
-[`bin/fm-prestart-control-lib.sh`](../bin/fm-prestart-control-lib.sh) owns the complete narrow proof and [`fm-control.sh --help`](../bin/fm-control.sh) owns its invocation and supported limits.
+[`bin/fm-prestart-control-lib.sh`](../bin/fm-prestart-control-lib.sh) owns the complete narrow proof.
 The existing native project mutex excludes a still-running producer and concurrent starts.
 Existing task records remain authoritative and cannot be bypassed through this operation.
 Its Herdr key delivery is observable-only, so a missing server is never started by prestart cancellation.

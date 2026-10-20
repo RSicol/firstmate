@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # fm-control.sh - the CONTROL PLANE for a firstmate-owned agent: allowlisted
-# lifecycle verbs addressed to an exact task id.
+# lifecycle verbs and narrow non-agent recovery addressed to an exact task id.
 #
 # Usage: fm-control.sh <task-id> interrupt
 #        fm-control.sh <task-id> exit
@@ -110,7 +110,7 @@
 # handles a held, queued ship/scout with NO task record, before any agent
 # started. The explicit pane must bind to the actual local Herdr coordinator,
 # its workspace, the task's single-pane tab and canonical home/projects clone,
-# and a positively verified plain Treehouse/Git fetch process tree. The shared
+# and a positively verified plain Treehouse/Git HTTPS fetch process tree. The shared
 # project mutex excludes a still-running producer or concurrent start. Labels
 # are contradiction checks, never a way to discover or authorize an endpoint.
 # Other backends, linked project clones, active/unknown agents and unfamiliar
@@ -118,8 +118,9 @@
 # Without --if-match this prints a fresh identity snapshot, fingerprint and
 # input_sent=false; it sends NOTHING. The operator must compare that identity
 # with the specifically authorized failed start. A repeated call with that
-# exact fingerprint reruns every proof, then cancels ONLY that prestart and
-# verifies the original processes gone, terminal preserved and project clean.
+# exact fingerprint reruns every proof, then sends one Ctrl+C ONLY to that
+# prestart and verifies the original processes gone, terminal preserved and
+# project clean. A failed stop verification never sends further input.
 # A fingerprint is a freshness condition, never permission. No task metadata,
 # worktree removal, endpoint closure or generic raw-key interface is added.
 #

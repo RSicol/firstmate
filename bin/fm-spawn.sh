@@ -339,18 +339,28 @@
 #   Spawn refuses an unsafe pre-existing task temp root or launch namespace, and
 #   task teardown removes only the current home's launch namespace.
 # Treehouse GitHub prefetch credentials:
-#   A per-call GIT_CONFIG_COUNT=2 with KEY_0=credential.helper, VALUE_0 empty,
-#   KEY_1=credential.https://github.com.helper and VALUE_1 selecting the native
-#   `!gh auth git-credential` helper is also applied to `treehouse get` in the
-#   destination shell, before its fetch. An absolute gh executable, quoted or
-#   unquoted, is accepted too; the forwarded command always quotes that path.
+#   On fresh Treehouse-backed ship/scout spawns, a per-call descriptor with
+#   GIT_CONFIG_COUNT=2, GIT_CONFIG_KEY_0=credential.helper, empty GIT_CONFIG_VALUE_0,
+#   GIT_CONFIG_KEY_1=credential.https://github.com.helper and GIT_CONFIG_VALUE_1
+#   selecting `!gh auth git-credential` is applied in the destination shell
+#   before Treehouse fetches. An absolute helper path must match the caller's
+#   PATH-resolved gh; that path may also be single-quoted in the descriptor.
+#   The forwarded command always quotes the selected executable path.
+#   Both shells must resolve the same existing physical gh configuration
+#   directory through an absolute XDG_CONFIG_HOME or the HOME/.config fallback.
+#   Differing or indeterminate roots refuse before Treehouse or the helper runs;
+#   HOME and XDG_CONFIG_HOME are never copied or rewritten to force a match.
 #   This only applies to GitHub HTTPS origins, never copies credential values,
 #   and does not write Git or shell configuration. Other Git environments are
-#   unchanged, not generally forwarded. A recognized but unsupported helper or
-#   custom gh authentication environment refuses before creating an endpoint;
-#   the bridge never copies token variables or silently chooses another store.
+#   unchanged, not generally forwarded. A recognized but unsupported caller
+#   helper or gh authentication environment refuses before endpoint creation;
+#   unsupported destination authentication refuses before Treehouse runs.
+#   The bridge never copies token variables or silently chooses another store.
 #   Missing destination authentication cannot open an askpass or terminal prompt.
-#   This prefetch scope is distinct from the later worker launch environment.
+#   This prefetch scope is distinct from the later worker launch environment;
+#   relaunches, secondmates and Orca do not use it.
+#   tests/fm-spawn-github-prefetch.test.sh exercises the shell boundary with
+#   real Bash/Fish and Git credential plumbing, but a fixture helper, not a login.
 # Launch environment (config/launch-env-allowlist):
 #   Absent means unchanged ambient inheritance. A present readable regular file
 #   opts every launch (ship, scout, secondmate, raw command, and relaunch) into
