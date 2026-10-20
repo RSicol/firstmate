@@ -1,0 +1,57 @@
+{
+  "id": "cli:pane:process_info",
+  "result": {
+    "process_info": {
+      "foreground_process_group_id": 1566262,
+      "foreground_processes": [
+        {
+          "argv": [
+            "treehouse",
+            "get"
+          ],
+          "cmdline": "treehouse get",
+          "cwd": "/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation-continuation/lab-home/projects/app",
+          "name": "treehouse",
+          "pid": 1566262
+        },
+        {
+          "argv": [
+            "git",
+            "fetch",
+            "origin"
+          ],
+          "cmdline": "git fetch origin",
+          "cwd": "/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation-continuation/lab-home/projects/app",
+          "name": "git",
+          "pid": 1566290
+        },
+        {
+          "argv": [
+            "/usr/lib/git-core/git",
+            "remote-https",
+            "origin",
+            "https://127.0.0.1:47415/own.git"
+          ],
+          "cmdline": "/usr/lib/git-core/git remote-https origin https://127.0.0.1:47415/own.git",
+          "cwd": "/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation-continuation/lab-home/projects/app",
+          "name": "git",
+          "pid": 1566291
+        },
+        {
+          "argv": [
+            "/usr/lib/git-core/git-remote-https",
+            "origin",
+            "https://127.0.0.1:47415/own.git"
+          ],
+          "cmdline": "/usr/lib/git-core/git-remote-https origin https://127.0.0.1:47415/own.git",
+          "cwd": "/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation-continuation/lab-home/projects/app",
+          "name": "git-remote-http",
+          "pid": 1566292
+        }
+      ],
+      "pane_id": "w1:p2",
+      "shell_pid": 1565388
+    },
+    "type": "pane_process_info"
+  }
+}

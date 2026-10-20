@@ -1,0 +1,5 @@
+jq-1.8.2
+true
+matching tab expression exit=0
+false
+foreign label expression exit=1

@@ -1,0 +1,6 @@
+STOP: native inspection refused; no retry or input
+Traceback (most recent call last):
+  File "/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation-continuation/waiting-prestart.py", line 76, in <module>
+    if (ev/'inspection-errors.log').exists() and (ev/'inspection-errors.log').stat().st_size:raise RuntimeError('native inspection refused; no retry or input')
+                                                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: native inspection refused; no retry or input

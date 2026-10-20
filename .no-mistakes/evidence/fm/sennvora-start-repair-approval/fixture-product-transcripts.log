@@ -1,0 +1,80 @@
+Synthetic authentication only; Treehouse, gh and terminal transports below are fixtures.
+No live fetch, credential-store lookup, worker, or real cancellation is claimed.
+
+
+=== bash: matching effective configuration roots ===
+warning: /home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation/tmp/fm-spawn-github-prefetch.86wwzr/bash-transcript-success/home/data/prefetch-bash-transcript-success/launch-brief.md records no ship branch; defaulting to legacy branch fm/prefetch-bash-transcript-success
+warning: /home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation/tmp/fm-spawn-github-prefetch.86wwzr/bash-transcript-success/home/data/prefetch-bash-transcript-success/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches
+spawned prefetch-bash-transcript-success harness=codex kind=ship mode=no-mistakes yolo=off window=firstmate:fm-prefetch-bash-transcript-success worktree=/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation/tmp/fm-spawn-github-prefetch.86wwzr/bash-transcript-success/worktree
+spawn exit=0; destination exit=0
+Destination entered the task worktree in the original shell.
+Git credential plumbing artifact: real-git-credential-flow
+Selected helper invocation: native-helper
+
+=== bash: HOME fallback store mismatch ===
+warning: /home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation/tmp/fm-spawn-github-prefetch.86wwzr/bash-transcript-root-refusal/home/data/prefetch-bash-transcript-root-refusal/launch-brief.md records no ship branch; defaulting to legacy branch fm/prefetch-bash-transcript-root-refusal
+warning: /home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation/tmp/fm-spawn-github-prefetch.86wwzr/bash-transcript-root-refusal/home/data/prefetch-bash-transcript-root-refusal/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches
+error: treehouse get did not enter an isolated worktree within 60s (last seen '/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation/tmp/fm-spawn-github-prefetch.86wwzr/bash-transcript-root-refusal/project': it is the spawning project itself; spawning project '/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation/tmp/fm-spawn-github-prefetch.86wwzr/bash-transcript-root-refusal/project'); inspect window firstmate:fm-prefetch-bash-transcript-root-refusal
+spawn exit=1; destination exit=1
+Destination diagnostic: error: GitHub prefetch gh configuration root differs from caller
+Neither Treehouse nor any helper was invoked; destination directory unchanged.
+
+=== fish: matching effective configuration roots ===
+warning: /home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation/tmp/fm-spawn-github-prefetch.86wwzr/fish-transcript-success/home/data/prefetch-fish-transcript-success/launch-brief.md records no ship branch; defaulting to legacy branch fm/prefetch-fish-transcript-success
+warning: /home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation/tmp/fm-spawn-github-prefetch.86wwzr/fish-transcript-success/home/data/prefetch-fish-transcript-success/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches
+spawned prefetch-fish-transcript-success harness=codex kind=ship mode=no-mistakes yolo=off window=firstmate:fm-prefetch-fish-transcript-success worktree=/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation/tmp/fm-spawn-github-prefetch.86wwzr/fish-transcript-success/worktree
+spawn exit=0; destination exit=0
+Destination entered the task worktree in the original shell.
+Git credential plumbing artifact: real-git-credential-flow
+Selected helper invocation: native-helper
+
+=== fish: HOME fallback store mismatch ===
+warning: /home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation/tmp/fm-spawn-github-prefetch.86wwzr/fish-transcript-root-refusal/home/data/prefetch-fish-transcript-root-refusal/launch-brief.md records no ship branch; defaulting to legacy branch fm/prefetch-fish-transcript-root-refusal
+warning: /home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation/tmp/fm-spawn-github-prefetch.86wwzr/fish-transcript-root-refusal/home/data/prefetch-fish-transcript-root-refusal/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches
+error: treehouse get did not enter an isolated worktree within 60s (last seen '/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation/tmp/fm-spawn-github-prefetch.86wwzr/fish-transcript-root-refusal/project': it is the spawning project itself; spawning project '/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation/tmp/fm-spawn-github-prefetch.86wwzr/fish-transcript-root-refusal/project'); inspect window firstmate:fm-prefetch-fish-transcript-root-refusal
+spawn exit=1; destination exit=1
+Destination diagnostic: error: GitHub prefetch gh configuration root differs from caller
+Neither Treehouse nor any helper was invoked; destination directory unchanged.
+
+=== synthetic prestart: inspection sends no input ===
+{
+  "actor_shell": 534097,
+  "head": "e27176df9951b54495e53f296e9ac7d75853db27",
+  "home": "/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation/tmp/fm-control-prestart.YS5CYI/transcript-proof/home",
+  "pane": "w1:p2",
+  "processes": [
+    {
+      "group": 90000011,
+      "parent": 90000010,
+      "pid": 90000011,
+      "started": "Thu Jan  1 00:00:01 1970"
+    },
+    {
+      "group": 90000011,
+      "parent": 90000011,
+      "pid": 90000012,
+      "started": "Thu Jan  1 00:00:01 1970"
+    }
+  ],
+  "project": "/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation/tmp/fm-control-prestart.YS5CYI/transcript-proof/home/projects/app",
+  "session": "fm-lab-prestart-unit-534097-transcript-proof",
+  "shell": 90000010,
+  "tab": "w1:t2",
+  "task": "orphan",
+  "treehouse": 90000011,
+  "workspace": "w1",
+  "proof": "6a9917f2d280c7acea1c33dcbb25f76f5f17ad26",
+  "input_sent": false
+}
+
+=== synthetic prestart: changed process identity invalidates proof ===
+error: prestart identity changed; no input sent
+error: cancel-prestart did not establish its required result
+exit=1
+
+=== synthetic prestart: matching proof cancels once and verifies stop ===
+prestart stopped: orphan; endpoint preserved; project unchanged
+exit=0
+Recorded fixture key delivery: w1:p2 ctrl+c
+
+All transcript fixtures are removed on exit.

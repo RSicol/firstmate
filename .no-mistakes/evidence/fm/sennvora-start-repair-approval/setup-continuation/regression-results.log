@@ -1,0 +1,4 @@
+fm-spawn-github-prefetch exit=0 duration_seconds=171
+fm-control-prestart exit=0 duration_seconds=30
+fm-control exit=0 duration_seconds=87
+fm-spawn-worktree-settle exit=0 duration_seconds=13

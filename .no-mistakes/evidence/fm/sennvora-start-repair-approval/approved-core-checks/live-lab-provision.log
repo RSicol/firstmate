@@ -1,0 +1,5 @@
+command: bash bin/fm-herdr-lab.sh provision fm-lab-start-repair-3909255-1426
+fm-herdr-lab: tripwire already exists for 'fm-lab-start-repair-3909255-1426'; refusing ambiguous ownership
+provision_exit_code=1
+STOP: guard/tool refusal; no alternate binary, runtime or control
+driver_exit_code=1

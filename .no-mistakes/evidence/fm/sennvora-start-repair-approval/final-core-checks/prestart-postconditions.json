@@ -1,0 +1,8 @@
+{
+  "snapshot_sent_no_input": true,
+  "same_processes_still_running_after_inspection": true,
+  "original_terminal_shell_preserved": true,
+  "only_original_shell_after_cancellation": true,
+  "inspection_exit_zero": true,
+  "cancellation_exit_zero": true
+}

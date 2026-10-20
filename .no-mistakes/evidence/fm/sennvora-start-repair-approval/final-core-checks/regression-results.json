@@ -1,0 +1,26 @@
+[
+  {
+    "test": "bash tests/fm-spawn-github-prefetch.test.sh",
+    "exit": 0,
+    "seconds": 171.0,
+    "live": false
+  },
+  {
+    "test": "bash tests/fm-control-prestart.test.sh",
+    "exit": 0,
+    "seconds": 29.2,
+    "live": false
+  },
+  {
+    "test": "bash tests/fm-control.test.sh",
+    "exit": 0,
+    "seconds": 87.3,
+    "live": false
+  },
+  {
+    "test": "bash tests/fm-spawn-worktree-settle.test.sh",
+    "exit": 0,
+    "seconds": 13.2,
+    "live": false
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "owned_lab_absent": true,
+  "default_baseline_unchanged": true,
+  "default_still_running": true,
+  "owned_tripwire_removed": true
+}

@@ -1,0 +1,24 @@
+ok - none HTTP snapshot and cancellation refuse without input
+ok - none HTTPS cancels once, verifies stop and never adopts an agent
+ok - remote-https HTTP snapshot and cancellation refuse without input
+ok - remote-https HTTPS cancels once, verifies stop and never adopts an agent
+ok - git-remote-http HTTP snapshot and cancellation refuse without input
+ok - git-remote-http HTTPS cancels once, verifies stop and never adopts an agent
+ok - git-remote-https HTTP snapshot and cancellation refuse without input
+ok - git-remote-https HTTPS cancels once, verifies stop and never adopts an agent
+ok - git remote-http refuses even with an HTTPS origin
+ok - bad-home refuses without input
+ok - bad-project refuses without input
+ok - ambiguous refuses without input
+ok - agent refuses without input
+ok - unknown-process refuses without input
+ok - bad-parent refuses without input
+ok - not-held refuses without input
+ok - server-gone refuses without input
+ok - an active native producer stays in control of its project mutex
+ok - changed process start identity invalidates the fingerprint
+ok - ordinary task records cannot be bypassed by prestart cancellation
+ok - unlanded primary-project changes are preserved
+ok - failed stop verification refuses without escalating or closing the pane
+
+exit_code=0

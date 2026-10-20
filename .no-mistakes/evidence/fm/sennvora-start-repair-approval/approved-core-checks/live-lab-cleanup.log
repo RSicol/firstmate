@@ -1,0 +1,6 @@
+cleanup_command: bash bin/fm-herdr-lab.sh teardown fm-lab-start-repair-3909255-1426
+teardown_exit_code=0
+cleanup_metadata_exit_code=0
+unchanged_default_compare_exit_code=0
+owned_lab_absent=true; prepared_tripwire_removed=true; default_unchanged=true
+driver_exit_code=0

@@ -1,0 +1,89 @@
+$ tasks-axi add sennvora-start-repair-approval 'Own disposable waiting HTTPS prestart' --kind scout --repo app --json
+{
+  "ok": true,
+  "action": "add",
+  "task": {
+    "id": "sennvora-start-repair-approval",
+    "title": "Own disposable waiting HTTPS prestart",
+    "state": "queued",
+    "kind": "scout",
+    "repo": "app",
+    "priority": null,
+    "created": "2026-10-20",
+    "closed": null,
+    "deps": [],
+    "hold": null,
+    "links": [],
+    "body": null,
+    "blocked": false,
+    "blocked_by": [],
+    "held": false
+  }
+}
+
+exit=0
+$ tasks-axi hold sennvora-start-repair-approval --reason 'Controlled own lab prestart cancellation check' --kind captain --json
+{
+  "ok": true,
+  "action": "hold",
+  "task": {
+    "id": "sennvora-start-repair-approval",
+    "title": "Own disposable waiting HTTPS prestart",
+    "state": "queued",
+    "kind": "scout",
+    "repo": "app",
+    "priority": null,
+    "created": "2026-10-20",
+    "closed": null,
+    "deps": [],
+    "hold": {
+      "reason": "Controlled own lab prestart cancellation check",
+      "kind": "captain",
+      "until": null
+    },
+    "links": [],
+    "body": null,
+    "blocked": false,
+    "blocked_by": [],
+    "held": true
+  }
+}
+
+exit=0
+$ git init --template= --initial-branch=main /home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation-current/lab-home/projects/app
+Initialized empty Git repository in /home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation-current/lab-home/projects/app/.git/
+
+exit=0
+$ git add README.md
+
+exit=0
+$ git -c core.hooksPath=/dev/null -c 'user.name=Lab Test' -c user.email=lab@example.invalid commit -qm 'Own lab seed'
+
+exit=0
+$ git remote add origin https://127.0.0.1:45203/own.git
+
+exit=0
+$ git rev-parse HEAD
+db3ad7ec11ad461cb1f795c00776755f610854fe
+
+exit=0
+$ bash /home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/bin/fm-herdr-lab.sh run fm-lab-start-repair-cur-64630-14040 workspace create --cwd /home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation-current/lab-home --label own-start-repair --no-focus
+{"id":"cli:workspace:create","result":{"root_pane":{"agent_status":"unknown","cwd":"/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation-current/lab-home","focused":true,"foreground_cwd":"/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation-current/lab-home","pane_id":"w1:p1","revision":0,"scroll":{"max_offset_from_bottom":0,"offset_from_bottom":0,"viewport_rows":40},"tab_id":"w1:t1","terminal_id":"term_65e453c96aa2a1","workspace_id":"w1"},"tab":{"agent_status":"unknown","focused":true,"label":"1","number":1,"pane_count":1,"tab_id":"w1:t1","workspace_id":"w1"},"type":"workspace_created","workspace":{"active_tab_id":"w1:t1","agent_status":"unknown","focused":true,"label":"own-start-repair","number":1,"pane_count":1,"tab_count":1,"workspace_id":"w1"}}}
+
+exit=0
+$ bash /home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/bin/fm-herdr-lab.sh run fm-lab-start-repair-cur-64630-14040 tab list --workspace w1
+{"id":"cli:tab:list","result":{"tabs":[{"agent_status":"unknown","focused":true,"label":"1","number":1,"pane_count":1,"tab_id":"w1:t1","workspace_id":"w1"}],"type":"tab_list"}}
+
+exit=0
+$ bash /home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/bin/fm-herdr-lab.sh run fm-lab-start-repair-cur-64630-14040 pane list --workspace w1
+{"id":"cli:pane:list","result":{"panes":[{"agent_status":"unknown","cwd":"/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation-current/lab-home","focused":true,"foreground_cwd":"/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation-current/lab-home","pane_id":"w1:p1","revision":0,"scroll":{"max_offset_from_bottom":0,"offset_from_bottom":0,"viewport_rows":40},"tab_id":"w1:t1","terminal_id":"term_65e453c96aa2a1","workspace_id":"w1"}],"type":"pane_list"}}
+
+exit=0
+$ bash /home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/bin/fm-herdr-lab.sh run fm-lab-start-repair-cur-64630-14040 tab create --workspace w1 --cwd /home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation-current/lab-home/projects/app --label fm-sennvora-start-repair-approval --no-focus
+{"id":"cli:tab:create","result":{"root_pane":{"agent_status":"unknown","cwd":"/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation-current/lab-home/projects/app","focused":false,"foreground_cwd":"/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation-current/lab-home/projects/app","pane_id":"w1:p2","revision":0,"scroll":{"max_offset_from_bottom":0,"offset_from_bottom":0,"viewport_rows":40},"tab_id":"w1:t2","terminal_id":"term_65e453c97f2fb2","workspace_id":"w1"},"tab":{"agent_status":"unknown","focused":false,"label":"fm-sennvora-start-repair-approval","number":2,"pane_count":1,"tab_id":"w1:t2","workspace_id":"w1"},"type":"tab_created"}}
+
+exit=0
+$ bash /home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/bin/fm-herdr-lab.sh run fm-lab-start-repair-cur-64630-14040 pane run w1:p2 'env TREEHOUSE_ROOT=/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation-current/lab-home/pool GIT_TERMINAL_PROMPT=0 GIT_ASKPASS=/bin/false treehouse get'
+
+exit=0
+STOP: Expecting value: line 1 column 1 (char 0)

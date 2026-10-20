@@ -1,0 +1,22 @@
+[
+  {
+    "test": "fm-spawn-github-prefetch",
+    "exit": 0,
+    "seconds": 46.3
+  },
+  {
+    "test": "fm-control-prestart",
+    "exit": 0,
+    "seconds": 27.4
+  },
+  {
+    "test": "fm-control",
+    "exit": 0,
+    "seconds": 39.1
+  },
+  {
+    "test": "fm-spawn-worktree-settle",
+    "exit": 0,
+    "seconds": 8.4
+  }
+]

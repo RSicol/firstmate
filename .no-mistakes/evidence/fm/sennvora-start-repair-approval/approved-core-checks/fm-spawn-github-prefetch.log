@@ -1,0 +1,54 @@
+ok - bash preserves the parent-shell directory transition and native helper with authentication 'unset'
+ok - bash preserves the parent-shell directory transition and native helper with authentication 'GH_TOKEN='
+ok - bash preserves the parent-shell directory transition and native helper with authentication 'GITHUB_TOKEN='
+ok - bash preserves the parent-shell directory transition and native helper with authentication 'GH_CONFIG_DIR='
+ok - bash preserves the parent-shell directory transition and native helper with authentication 'GH_HOST='
+ok - bash preserves the parent-shell directory transition and native helper with authentication 'GH_HOST=github.com'
+ok - bash rejects GH_TOKEN before Treehouse without exposing its value or changing directory
+ok - bash rejects GITHUB_TOKEN before Treehouse without exposing its value or changing directory
+ok - bash rejects GH_CONFIG_DIR before Treehouse without exposing its value or changing directory
+ok - bash rejects GH_HOST before Treehouse without exposing its value or changing directory
+ok - bash accepts matching effective roots through home-fallback
+ok - bash accepts matching effective roots through xdg-to-home
+ok - bash accepts matching effective roots through home-to-xdg
+ok - bash accepts matching effective roots through equivalent-xdg
+ok - bash rejects xdg-to-xdg configuration roots before Treehouse without disclosure
+ok - bash rejects xdg-to-home configuration roots before Treehouse without disclosure
+ok - bash rejects home-to-xdg configuration roots before Treehouse without disclosure
+ok - bash rejects home-to-home configuration roots before Treehouse without disclosure
+ok - bash rejects relative-xdg configuration roots before Treehouse without disclosure
+ok - bash rejects missing-xdg configuration roots before Treehouse without disclosure
+ok - bash rejects relative caller roots before endpoint creation
+ok - bash rejects missing caller roots before endpoint creation
+ok - bash without the bridge retains ordinary behavior and cannot bypass isolation
+ok - bash missing destination authentication refuses without asking for credentials
+ok - bash arbitrary helper is refused before endpoint creation without printing its value
+ok - bash token environment is neither copied nor silently replaced by another account store
+ok - fish preserves the parent-shell directory transition and native helper with authentication 'unset'
+ok - fish preserves the parent-shell directory transition and native helper with authentication 'GH_TOKEN='
+ok - fish preserves the parent-shell directory transition and native helper with authentication 'GITHUB_TOKEN='
+ok - fish preserves the parent-shell directory transition and native helper with authentication 'GH_CONFIG_DIR='
+ok - fish preserves the parent-shell directory transition and native helper with authentication 'GH_HOST='
+ok - fish preserves the parent-shell directory transition and native helper with authentication 'GH_HOST=github.com'
+ok - fish rejects GH_TOKEN before Treehouse without exposing its value or changing directory
+ok - fish rejects GITHUB_TOKEN before Treehouse without exposing its value or changing directory
+ok - fish rejects GH_CONFIG_DIR before Treehouse without exposing its value or changing directory
+ok - fish rejects GH_HOST before Treehouse without exposing its value or changing directory
+ok - fish accepts matching effective roots through home-fallback
+ok - fish accepts matching effective roots through xdg-to-home
+ok - fish accepts matching effective roots through home-to-xdg
+ok - fish accepts matching effective roots through equivalent-xdg
+ok - fish rejects xdg-to-xdg configuration roots before Treehouse without disclosure
+ok - fish rejects xdg-to-home configuration roots before Treehouse without disclosure
+ok - fish rejects home-to-xdg configuration roots before Treehouse without disclosure
+ok - fish rejects home-to-home configuration roots before Treehouse without disclosure
+ok - fish rejects relative-xdg configuration roots before Treehouse without disclosure
+ok - fish rejects missing-xdg configuration roots before Treehouse without disclosure
+ok - fish rejects relative caller roots before endpoint creation
+ok - fish rejects missing caller roots before endpoint creation
+ok - fish without the bridge retains ordinary behavior and cannot bypass isolation
+ok - fish missing destination authentication refuses without asking for credentials
+ok - fish arbitrary helper is refused before endpoint creation without printing its value
+ok - fish token environment is neither copied nor silently replaced by another account store
+
+exit_code=0

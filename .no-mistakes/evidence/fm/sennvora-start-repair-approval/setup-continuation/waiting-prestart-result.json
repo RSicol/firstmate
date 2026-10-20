@@ -1,0 +1,5 @@
+{
+  "result": "blocked",
+  "live": false,
+  "reason": "native inspection refused; no retry or input"
+}

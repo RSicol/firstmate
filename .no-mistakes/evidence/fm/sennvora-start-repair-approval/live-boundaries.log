@@ -1,0 +1,20 @@
+Isolated Herdr prepare (real herdr; no default session is created):
+fm-herdr-lab: fleet-state tripwire requires exactly one running default session
+prepare exit=1
+
+Scenario: Cancellation without an explicit pane is refused
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation/tmp/live-boundaries.Oh1t2H/lab
+error: cancel-prestart requires --pane
+exit=1
+
+Scenario: A malformed freshness proof is refused
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation/tmp/live-boundaries.Oh1t2H/lab
+error: --if-match requires the exact fingerprint from the read-only snapshot
+exit=1
+
+Scenario: An unbound caller cannot inspect or cancel a prestart
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation/tmp/live-boundaries.Oh1t2H/lab
+error: cancel-prestart could not prove an abandoned held prestart owned by this coordinator; no input sent
+exit=1
+
+No worker record created; disposable home removed on exit. No server, agent, or fetch was started.

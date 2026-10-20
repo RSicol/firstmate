@@ -1,0 +1,41 @@
+{
+  "actor_shell": 2214374,
+  "head": "6df79c209cc4ce3a71c1349d37e01b0ebf1836f3",
+  "home": "/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation-final/lab-home",
+  "pane": "w2:p2",
+  "processes": [
+    {
+      "group": 2215308,
+      "parent": 2214436,
+      "pid": 2215308,
+      "started": "Tue Oct 20 16:16:55 2026"
+    },
+    {
+      "group": 2215308,
+      "parent": 2215308,
+      "pid": 2215342,
+      "started": "Tue Oct 20 16:16:55 2026"
+    },
+    {
+      "group": 2215308,
+      "parent": 2215342,
+      "pid": 2215344,
+      "started": "Tue Oct 20 16:16:55 2026"
+    },
+    {
+      "group": 2215308,
+      "parent": 2215344,
+      "pid": 2215345,
+      "started": "Tue Oct 20 16:16:55 2026"
+    }
+  ],
+  "project": "/home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/worktrees/5605f6cd53c8/01M55HGHVS6C46RYFFX5EXDFRX/.validation-final/lab-home/projects/app",
+  "session": "fm-lab-start-repair-fin-2211127-5361",
+  "shell": 2214436,
+  "tab": "w2:t2",
+  "task": "sennvora-start-repair-approval",
+  "treehouse": 2215308,
+  "workspace": "w2",
+  "proof": "bd0e8f213cdfc07fedc76f1ab50994731dc52734",
+  "input_sent": false
+}

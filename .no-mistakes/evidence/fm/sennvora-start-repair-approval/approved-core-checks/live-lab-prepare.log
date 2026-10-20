@@ -1,0 +1,6 @@
+herdr 0.9.5
+fresh_lab=fm-lab-start-repair-3909255-1426
+command: PATH=/usr/local/bin:<unchanged> TMPDIR=<worktree> FM_HERDR_LAB_STATE_DIR=<worktree> bash bin/fm-herdr-lab.sh prepare <fresh_lab>
+prepare_exit_code=0
+default_baseline=verified_by_guard
+driver_exit_code=0

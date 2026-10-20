@@ -1,0 +1,8 @@
+git diff --exit-code
+tracked_diff_exit_code=0
+git status --short
+git status --porcelain=v1 --untracked-files=all
+git rev-parse HEAD
+44973119034e1b6cf3414a741c641bdee1b42918
+retained jq counterevidence sha256
+6f9f5da21f23eceb60457bc53e2388065955e024229fba62ce32864b131a6f6a  /home/sreazy/sennvora/arbeitsbereich/secondmate-website/config/no-mistakes-start-repair/evidence/01M55HGHVS6C46RYFFX5EXDFRX/approved-core-checks/../jq-label-counterevidence.log

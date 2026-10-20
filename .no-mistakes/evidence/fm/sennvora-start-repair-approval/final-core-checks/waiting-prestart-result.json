@@ -1,0 +1,14 @@
+{
+  "result": "pass",
+  "live": true,
+  "session": "fm-lab-start-repair-fin-2211127-5361",
+  "actor": "w2:p1",
+  "pane": "w2:p2",
+  "inspection_input_sent": false,
+  "matching_cancel_calls": 1,
+  "cancel_exit": 0,
+  "project_head_unchanged": true,
+  "project_clean": true,
+  "endpoint_preserved": true,
+  "metadata_not_adopted": true
+}

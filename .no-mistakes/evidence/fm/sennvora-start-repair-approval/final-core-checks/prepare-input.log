@@ -1,0 +1,19 @@
+{
+  "existing_descriptor_conflict": false,
+  "unknown_git_config_override": false,
+  "unsupported_auth_override_present": false,
+  "selected_entry_matches_outer": true,
+  "supplied_seed_exists": true,
+  "descriptor_count_two": true,
+  "descriptor_reset_helper": true,
+  "descriptor_github_key": true,
+  "descriptor_helper_present": true,
+  "seed_expected_origin": true,
+  "seed_expected_head": true,
+  "seed_clean": true,
+  "seed_ordinary_clone": true,
+  "command_generated_before_acquire": true,
+  "test_input_copy_in_worktree": true,
+  "seed_unchanged_after_copy": true
+}
+Own copy prepared locally; no external acquisition or authentication probe performed.

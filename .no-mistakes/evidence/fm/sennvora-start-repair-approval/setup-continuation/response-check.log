@@ -1,0 +1,7 @@
+REPRODUCED: original driver parses successful empty response as JSON
+PASS: empty command success, valid metadata, malformed metadata and command failure
+PASS: prior-premature-stderr-reproduced
+PASS: corrected-waits-for-success-despite-stderr
+PASS: nonzero-inspection-remains-failure
+PASS: malformed-inspection-remains-failure
+All focused response-contract checks passed; no real Herdr or authentication operation.

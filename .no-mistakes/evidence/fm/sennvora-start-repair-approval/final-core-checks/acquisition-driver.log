@@ -1,0 +1,23 @@
+{
+  "result": "pass",
+  "live": true,
+  "native_task": "sennvora-start-repair-approval",
+  "session": "fm-lab-start-repair-fin-2211127-5361",
+  "workspace": "w1",
+  "pane": "w1:p1",
+  "pane_run_exit": 0,
+  "pane_run_empty_response": true,
+  "treehouse_owned_git_fetch_count": 1,
+  "native_fetch_exit": 0,
+  "selected_native_helper_observed": true,
+  "same_destination_shell_pid": true,
+  "destination_entered_own_pool": true,
+  "acquired_common_dir_is_own_copy": true,
+  "acquired_head_matches_fetched_default": true,
+  "acquired_head": "06eea5f95641a78d8eaa0b220ca30a7a50a431d4",
+  "foreground_process_names": [
+    "bash"
+  ],
+  "auth_output_archived": false,
+  "actual_store_values_archived": false
+}

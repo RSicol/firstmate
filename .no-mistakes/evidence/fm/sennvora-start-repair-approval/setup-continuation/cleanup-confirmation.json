@@ -1,0 +1,9 @@
+{
+  "owned_lab_absent": true,
+  "default_baseline_unchanged": true,
+  "default_still_running": true,
+  "owned_tripwire_removed": true,
+  "matching_cancel_calls": 0,
+  "real_github_acquire_calls": 0,
+  "inspection_error_observed_after_driver_stop": true
+}
