@@ -1,0 +1,26 @@
+[
+  {
+    "command": "timeout 300 bash tests/fm-spawn-github-prefetch.test.sh",
+    "exit": 0,
+    "seconds": 172.5,
+    "live": false
+  },
+  {
+    "command": "timeout 300 bash tests/fm-control-prestart.test.sh",
+    "exit": 0,
+    "seconds": 29.07,
+    "live": false
+  },
+  {
+    "command": "timeout 300 bash tests/fm-control.test.sh",
+    "exit": 0,
+    "seconds": 86.78,
+    "live": false
+  },
+  {
+    "command": "timeout 300 bash tests/fm-spawn-worktree-settle.test.sh",
+    "exit": 0,
+    "seconds": 13.43,
+    "live": false
+  }
+]
