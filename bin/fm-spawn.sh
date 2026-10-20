@@ -2293,6 +2293,8 @@ spawn_treehouse_get_command() {  # <project>
     echo 'error: GitHub prefetch cannot forward a token or custom gh authentication environment; refusing to choose a different credential store' >&2
     return 1
   fi
+  # Defer variable expansion so the target shell checks its own environment.
+  # shellcheck disable=SC2016
   guard='if [ -n "${GH_TOKEN:-}" ] || [ -n "${GITHUB_TOKEN:-}" ] || [ -n "${GH_CONFIG_DIR:-}" ] || { [ -n "${GH_HOST:-}" ] && [ "$GH_HOST" != github.com ]; }; then printf "%s\n" "error: GitHub prefetch refuses unsupported destination gh authentication environment" >&2; exit 1; fi
 base=${XDG_CONFIG_HOME:-${HOME:+$HOME/.config}}
 case "$base" in /*) ;; *) printf "%s\n" "error: GitHub prefetch cannot determine gh configuration root" >&2; exit 1 ;; esac
